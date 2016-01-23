@@ -13,8 +13,11 @@ var svg = d3.select('.board').append('svg')
 var enemyData = new Array(numberEnemies);
 
 var enemies;
+var collisions = 0;
 
 var player;
+var count;
+var highScore;
 
 var createEnemies = function(enemyData) {
   enemies = svg.selectAll('circle')
@@ -29,6 +32,7 @@ var createEnemies = function(enemyData) {
 };
 
 var initialize = function(noEn, enemData){
+  count = 0;
   for (var i = 0; i <= noEn; i++) {
     enemyData[i] = [Math.floor(Math.random() * 490 + 5), Math.floor(Math.random() * 490 + 5)];
   }
@@ -56,7 +60,13 @@ var moveEnemies = function(enemyData) {
             var j = d3.interpolate(startPosY, endPosY);
             return function(t) {
               if(Math.abs(i(t) - player.attr('cx')) < 20 && Math.abs(j(t) - player.attr('cy')) < 20) {
-                console.log('collision');
+                if(count > highScore || highScore === undefined) {
+                  highScore = count;
+                }
+                d3.select('.highscore').selectAll('span').text(highScore);
+                count = 0;
+                collisions++;
+                d3.select('.collisions').selectAll('span').text(collisions);
                 player.style('fill', '#'+(Math.random()*0xFFFFFF<<0).toString(16));
               }
             };
@@ -64,8 +74,6 @@ var moveEnemies = function(enemyData) {
          .duration(500)
          .attr('cx', function(d){return d[1];})
          .attr('cy', function(d) {return d[0];});
-
-  // enemies.exit().remove();
 };
 
 var newEnemyData = function(){
@@ -98,26 +106,19 @@ var drag = d3.behavior.drag()
                                                           }}); })
              .on('dragend', function() { player.style('fill', '#54494B'); });
 
-var distanceHelper = function(x1, y1, x2, y2){
-    return Math.sqrt(Math.pow(Math.abs(x1-x2), 2) + Math.pow(Math.abs(y1-y2), 2));
-  };
-
-var checkCollisions = function(){
-  enemies.each(function(el){
-    // console.log(el[0]);
-    // console.log(el[1]);
-    // console.log(distanceHelper(el[0], el[1], parseInt(player.attr('cx')), parseInt(player.attr('cy'))));
-    if(distanceHelper(el[0], el[1], parseInt(player.attr('cx')), parseInt(player.attr('cy'))) < 20){
-      player.style('fill', '#'+(Math.random()*0xFFFFFF<<0).toString(16));
-      console.log('COLLISION');
-    }
-  });
-};
-
-
 
 initialize(numberEnemies, enemyData);
 
 setInterval(function() {
   newEnemyData();
   }, 1000);
+
+
+var increaseCount = function() {
+  count++;
+  d3.select('.current').selectAll('span').text(count);
+};
+
+setInterval(function() {
+  increaseCount();
+}, 100);
