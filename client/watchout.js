@@ -1,45 +1,64 @@
 
+var numberEnemies = prompt("How many enemies can you handle?!");
 
-var enemyData = [[10, 200], [50, 50], [300, 45]];
-
+if(typeof parseInt(numberEnemies) !== 'number') {
+  numberEnemies = 5;
+}
 
 var svg = d3.select('.board').append('svg')
             .attr('width', '500')
             .attr('height', '500');
 
 
+var enemyData = new Array(numberEnemies);
+
+var enemies;
+
+var createEnemies = function(enemyData) {
+  enemies = svg.selectAll('circle')
+                 .data(enemyData)
+                 .enter()
+                 .append('circle')
+                 .attr('class', 'enter')
+                 .attr('fill', '#FF8C42')
+                 .attr('cx', function(d){return d[1];})
+                 .attr('cy', function(d) {return d[0];})
+                 .attr('r', '10');
+};
+
+var initialize = function(noEn, enemData){
+  for (var i = 0; i < noEn; i++) {
+    enemyData[i] = [Math.floor(Math.random() * 490 + 5), Math.floor(Math.random() * 490 + 5)];
+  }
+  createEnemies(enemData);
+};
 
 
-var updateEnemies = function(enemyData) {
+var moveEnemies = function(enemyData) {
 
-  var enemies = svg.selectAll('circle')
-                 .data(enemyData, function(i) {return i;});
+  enemies.data(enemyData)
+         .transition()
+         .duration(500)
+         .attr('cx', function(d){return d[1];})
+         .attr('cy', function(d) {return d[0];});
+         
 
-  // enemies.attr('class', 'update');
-
-  enemies.enter().append('circle')
-               .attr('class', 'enter')
-               .attr('fill', 'yellow')
-               .attr('cx', function(d){return d[1];})
-               .attr('cy', function(d) {return d[0];})
-               .attr('r', '40');
-
-  enemies.exit().remove();
+  // enemies.exit().remove();
 };
 
 var newEnemyData = function(){
   function randomHelper(){
-    return [Math.floor(Math.random() * 500), Math.floor(Math.random() * 500)];
+    return [Math.floor(Math.random() * 490 + 5), Math.floor(Math.random() * 490 + 5)];
   }
   for(var i = 0; i < enemyData.length; i++){
     enemyData[i]=randomHelper();
   }
-  updateEnemies(enemyData);
+  moveEnemies(enemyData);
 };
 
 
 
-
+initialize(numberEnemies, enemyData);
 
 setInterval(function() {
   newEnemyData();
