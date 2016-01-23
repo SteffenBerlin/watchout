@@ -11,9 +11,14 @@ var svg = d3.select('.board').append('svg')
 
 
 var enemyData = new Array(numberEnemies);
+var drag = d3.behavior.drag()  
+             .on('dragstart', function() { player.style('fill', '#94778B'); })
+             .on('drag', function() { player.attr('cx', d3.event.x)
+                                            .attr('cy', d3.event.y); })
+             .on('dragend', function() { player.style('fill', '#54494B'); });
 
 var enemies;
-
+var player;
 var createEnemies = function(enemyData) {
   enemies = svg.selectAll('circle')
                  .data(enemyData)
@@ -27,9 +32,16 @@ var createEnemies = function(enemyData) {
 };
 
 var initialize = function(noEn, enemData){
-  for (var i = 0; i < noEn; i++) {
+  for (var i = 0; i <= noEn; i++) {
     enemyData[i] = [Math.floor(Math.random() * 490 + 5), Math.floor(Math.random() * 490 + 5)];
   }
+  player = svg.append('circle')
+              .attr('cx', '250')
+              .attr('cy', '250')
+              .attr('fill', '#54494B')
+              .attr('r', '10')
+              .call(drag);
+
   createEnemies(enemData);
 };
 
