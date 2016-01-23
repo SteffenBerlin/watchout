@@ -47,6 +47,20 @@ var moveEnemies = function(enemyData) {
 
   enemies.data(enemyData)
          .transition()
+         .tween("custom", function() {
+            var endPosX = this.__data__[1];
+            var startPosX = this.cx.animVal.value;
+            var endPosY = this.__data__[0];
+            var startPosY = this.cy.animVal.value;
+            var i = d3.interpolate(startPosX, endPosX);
+            var j = d3.interpolate(startPosY, endPosY);
+            return function(t) {
+              if(Math.abs(i(t) - player.attr('cx')) < 20 && Math.abs(j(t) - player.attr('cy')) < 20) {
+                console.log('collision');
+                player.style('fill', '#'+(Math.random()*0xFFFFFF<<0).toString(16));
+              }
+            };
+         })
          .duration(500)
          .attr('cx', function(d){return d[1];})
          .attr('cy', function(d) {return d[0];});
@@ -107,7 +121,3 @@ initialize(numberEnemies, enemyData);
 setInterval(function() {
   newEnemyData();
   }, 1000);
-
-setInterval(function() {
-  checkCollisions();
-  }, 50);
