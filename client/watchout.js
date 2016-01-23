@@ -13,8 +13,22 @@ var svg = d3.select('.board').append('svg')
 var enemyData = new Array(numberEnemies);
 var drag = d3.behavior.drag()  
              .on('dragstart', function() { player.style('fill', '#94778B'); })
-             .on('drag', function() { player.attr('cx', d3.event.x)
-                                            .attr('cy', d3.event.y); })
+             .on('drag', function() { player.attr('cx', function(){
+                                                          if(d3.event.x <= 0) {
+                                                            return 10;
+                                                          } else if(d3.event.x >= 500) {
+                                                            return 490;
+                                                          } else {
+                                                            return d3.event.x;
+                                                          }})
+                                            .attr('cy', function(){
+                                                          if(d3.event.y <= 0) {
+                                                            return 10;
+                                                          } else if(d3.event.y >= 500) {
+                                                            return 490;
+                                                          } else {
+                                                            return d3.event.y;
+                                                          }}); })
              .on('dragend', function() { player.style('fill', '#54494B'); });
 
 var enemies;
