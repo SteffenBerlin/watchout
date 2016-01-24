@@ -46,8 +46,15 @@ var initialize = function(noEn, enemData){
   createEnemies(enemData);
 };
 
+var prevCollision = false;
+
+var resetBoard = function() {
+  d3.select('.board').style('background-image', 'none');
+}
 
 var moveEnemies = function(enemyData) {
+
+  currentCollision = false;
 
   enemies.data(enemyData)
          .transition()
@@ -60,15 +67,24 @@ var moveEnemies = function(enemyData) {
             var j = d3.interpolate(startPosY, endPosY);
             return function(t) {
               if(Math.abs(i(t) - player.attr('cx')) < 20 && Math.abs(j(t) - player.attr('cy')) < 20) {
+                currentCollision = true;
+                d3.select('.board').style('background-image', 'url(gta_wasted.png)');
+                setTimeout(function() {
+                  resetBoard();
+                }, 75);
                 if(count > highScore || highScore === undefined) {
                   highScore = count;
                 }
                 d3.select('.highscore').selectAll('span').text(highScore);
                 count = 0;
-                collisions++;
+                if(prevCollision !== currentCollision) { 
+                  collisions++;
+                }
                 d3.select('.collisions').selectAll('span').text(collisions);
                 player.style('fill', '#'+(Math.random()*0xFFFFFF<<0).toString(16));
               }
+              prevCollision = currentCollision;
+              // d3.select('.board').style('background-image', 'url(space.jpg)');
             };
          })
          .duration(500)
